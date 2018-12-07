@@ -1,2 +1,9 @@
 .idea
 out
+/target/
+
+#eclipse
+/.project
+/.classpath
+/.settings/
+
