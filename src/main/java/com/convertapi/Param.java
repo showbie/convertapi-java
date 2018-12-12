@@ -57,7 +57,17 @@ public class Param {
     @SuppressWarnings("WeakerAccess")
     public Param(String name, InputStream stream, String fileName, Config config) {
         this(name);
-        this.value = upload(stream, fileName, config);
+        try {
+			this.value = upload(stream, stream.available(), fileName, config);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        isUploadedFile = true;
+    }
+    
+    public Param(String name, InputStream stream, long contentLength, String fileName) {
+        this(name);
+        this.value = upload(stream, contentLength, fileName, Config.defaults());
         isUploadedFile = true;
     }
 
@@ -106,13 +116,13 @@ public class Param {
                 : CompletableFuture.completedFuture(null);
     }
 
-    private static CompletableFuture<List<String>> upload(InputStream stream, String fileName, Config config) {
+    private static CompletableFuture<List<String>> upload(InputStream stream, long contentLength, String fileName, Config config) {
         return CompletableFuture.supplyAsync(() -> {
             Request request = Http.getRequestBuilder()
                     .url(Http.getUrlBuilder(config).addPathSegment("upload")
                             .addQueryParameter("filename", fileName)
                             .build())
-                    .post(RequestBodyStream.create(MediaType.parse("application/octet-stream"), stream))
+                    .post(RequestBodyStream.create(MediaType.parse("application/octet-stream"), stream, contentLength))
                     .build();
             try {
                 String id = Http.getClient().newCall(request).execute().body().string();
