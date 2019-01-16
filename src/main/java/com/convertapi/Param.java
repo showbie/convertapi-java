@@ -65,9 +65,9 @@ public class Param {
         isUploadedFile = true;
     }
     
-    public Param(String name, InputStream stream, long contentLength, String fileName) {
+    public Param(String name, InputStream stream, long contentLength, String fileName, Config config) {
         this(name);
-        this.value = upload(stream, contentLength, fileName, Config.defaults());
+        this.value = upload(stream, contentLength, fileName, config);
         isUploadedFile = true;
     }
 
